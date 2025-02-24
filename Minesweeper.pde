@@ -23,7 +23,7 @@ void setup ()
   }
 
   //about 20% of tiles are mines
-  System.out.println((int)((NUM_ROWS)*(NUM_COLS)*0.2));
+  //System.out.println((int)((NUM_ROWS)*(NUM_COLS)*0.2));
   setMines((int)((NUM_ROWS)*(NUM_COLS)*0.2));
   //System.out.println(i);
 }
@@ -70,12 +70,12 @@ public boolean isWon()
 public void displayLosingMessage()
 {
   //your code here
-  System.out.println("you died");
+  //System.out.println("you died");
   noLoop();
 }
 public void displayWinningMessage()
 {
-  System.out.println("SKIBIDI SIGMA OHIO RIZZ");
+  //System.out.println("SKIBIDI SIGMA OHIO RIZZ");
   //your code here
 }
 public boolean isValid(int r, int c)
