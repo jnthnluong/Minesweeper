@@ -101,7 +101,7 @@ public int countMines(int row, int col)
       }
     }
   }else{
-    System.out.println("invalid tile");
+    //System.out.println("invalid tile");
   }
   return numMines;
 }
