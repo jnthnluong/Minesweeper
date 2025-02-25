@@ -106,6 +106,7 @@ public int countMines(int row, int col)
   }
   return numMines;
 }
+//debug stuff
 private boolean showBombs = false;
 public void keyPressed(){
   if(key == 'n' || key == 'N' && !showBombs){
@@ -120,7 +121,8 @@ public void keyPressed(){
     }
   }
 }
-private int buttonsClicked = 0;
+
+private int buttonsClicked = 0; //used to make the first click create a blob
 public class MSButton
 {
   private int myRow, myCol;
@@ -190,14 +192,14 @@ public class MSButton
   }
   public void draw () 
   {
-    
-    if (flagged && !showing)
+    //*****
+    if (flagged) //showing boolean used to deal w/ issues for flagging already revealed stuff
       fill(240, 172, 82);
     else if ( clicked && mines.contains(this) ) 
       fill(255, 0, 0);
     else if (clicked && !flagged){
       fill( 200 );
-      showing = true;
+      //showing = true;
     }
     else 
     fill( 100 );
