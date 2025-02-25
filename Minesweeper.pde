@@ -51,31 +51,33 @@ public void draw ()
 
   if (isWon() == true)
     displayWinningMessage();
+  if(isLost) displayLosingMessage();
 }
 
 public boolean isWon()
 {
   //your code here
-  for(int i = 0; i < buttons.length; i++){
-    for(int g = 0; g < buttons[i].length; g++){
-      if(!(buttons[i][g].flagged == true || buttons[i][g].clicked == true)){
+  for (int i = 0; i < buttons.length; i++) {
+    for (int g = 0; g < buttons[i].length; g++) {
+      if (!(buttons[i][g].flagged == true || buttons[i][g].clicked == true)) {
         return false;
       }
     }
   }
- 
-  
+
+
   return true;
 }
+private boolean isLost = false;
 public void displayLosingMessage()
 {
   //your code here
-  //System.out.println("you died");
-  noLoop();
+  System.out.println("you died");
+  //noLoop();
 }
 public void displayWinningMessage()
 {
-  //System.out.println("SKIBIDI SIGMA OHIO RIZZ");
+  System.out.println("SKIBIDI SIGMA OHIO RIZZ");
   //your code here
 }
 public boolean isValid(int r, int c)
@@ -84,33 +86,46 @@ public boolean isValid(int r, int c)
   if (r < 0 || c < 0) return false;
   if (r < NUM_ROWS && c < NUM_COLS) return true;
   return false;
-  
 }
 public int countMines(int row, int col)
 {
   int numMines = 0;
   //your code here
-  if(isValid(row,col)){
-    for(int i = row-1; i <= row+1; i++){
-      for(int g = col-1; g <= col+1; g++){
-        if(isValid(i,g)){
-          if(mines.contains(buttons[i][g])){
+  if (isValid(row, col)) {
+    for (int i = row-1; i <= row+1; i++) {
+      for (int g = col-1; g <= col+1; g++) {
+        if (isValid(i, g)) {
+          if (mines.contains(buttons[i][g])) {
             numMines++;
           }
         }
       }
     }
-  }else{
+  } else {
     //System.out.println("invalid tile");
   }
   return numMines;
+}
+private boolean showBombs = false;
+public void keyPressed(){
+  if(key == 'n' || key == 'N' && !showBombs){
+    showBombs = true;
+    for(int i = 0; i < buttons.length; i++){
+      for(int g = 0; g < buttons[i].length; g++){
+        if(mines.contains(buttons[i][g])){
+          buttons[i][g].setClicked(true);
+          buttons[i][g].draw();
+        }
+      }
+    }
+  }
 }
 private int buttonsClicked = 0;
 public class MSButton
 {
   private int myRow, myCol;
   private float x, y, width, height;
-  private boolean clicked, flagged;
+  private boolean clicked, flagged, showing;
   private String myLabel;
 
   public MSButton ( int row, int col )
@@ -123,55 +138,67 @@ public class MSButton
     y = myRow*height;
     myLabel = "";
     flagged = clicked = false;
+    showing = false;
     Interactive.add( this ); // register it with the manager
   }
 
   // called by manager
+  
+  
   public void mousePressed () 
   {
-    if(buttonsClicked <= 1){
+    
+    if (buttonsClicked <= 1 && mouseButton == LEFT) {
       buttonsClicked++;
-      if(mines.contains(this)){ // makes it impossible to immediately lose
+      if (mines.contains(this)) { // makes it impossible to immediately lose
         mines.remove(this);
       }
-      
-      for(int i = myRow-1; i <= myRow+1; i++){
-        for(int g = myCol-1; g <= myCol+1; g++){
-          if(isValid(i,g) && !buttons[i][g].isClicked() && !buttons[i][g].isFlagged() && !mines.contains(buttons[i][g])){
-            buttons[i][g].mousePressed();
+
+      for (int i = myRow-1; i <= myRow+1; i++) { // starts the first blob no matter what
+        for (int g = myCol-1; g <= myCol+1; g++) {
+          if (isValid(i, g) && !buttons[i][g].isClicked() && !buttons[i][g].isFlagged() && !mines.contains(buttons[i][g])) {
+            if (mouseButton == LEFT) {
+              buttons[i][g].mousePressed();
+            }
           }
         }
       }
-      
     }
     clicked = true;
-    if(mouseButton == RIGHT){
+    
+
+    if (mouseButton == RIGHT && !showing) {
       flagged = !flagged;
-    }else if(mines.contains(this)){
-      
+      if (!flagged) clicked = false;
+    } else if (mines.contains(this) && !flagged) {
       displayLosingMessage();
-    }else if(countMines(myRow,myCol)>0){
-      setLabel(countMines(myRow,myCol));
-    }else{
-      // recursively call mousePressed??
-      for(int i = myRow-1; i <= myRow+1; i++){
-        for(int g = myCol-1; g <= myCol+1; g++){
-          if(isValid(i,g) && !buttons[i][g].isClicked() && !buttons[i][g].isFlagged() && !mines.contains(buttons[i][g])){
+      isLost = true;
+    } else if (countMines(myRow, myCol)>0 && !flagged) {
+      setLabel(countMines(myRow, myCol));
+    } else {
+      for (int i = myRow-1; i <= myRow+1; i++) {
+        for (int g = myCol-1; g <= myCol+1; g++) {
+          if (isValid(i, g) && !buttons[i][g].isClicked() && !buttons[i][g].isFlagged() && !mines.contains(buttons[i][g]) && !flagged) {
             buttons[i][g].mousePressed();
           }
         }
       }
     }
     //your code here
+    
+    
   }
   public void draw () 
-  {    
-    if (flagged)
-      fill(0);
+  {
+    
+    if (flagged && !showing)
+      fill(240, 172, 82);
     else if ( clicked && mines.contains(this) ) 
       fill(255, 0, 0);
-    else if (clicked)
+    else if (clicked && !flagged){
       fill( 200 );
+      showing = true;
+    }
     else 
     fill( 100 );
 
@@ -191,8 +218,11 @@ public class MSButton
   {
     return flagged;
   }
-  public boolean isClicked(){
+  public boolean isClicked() {
     return clicked;
+  }
+  public void setClicked(boolean c){
+    clicked = c;
   }
 
   public int getRow() {
