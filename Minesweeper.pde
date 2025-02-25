@@ -192,14 +192,14 @@ public class MSButton
   }
   public void draw () 
   {
-    //*****
-    if (flagged) //showing boolean used to deal w/ issues for flagging already revealed stuff
+    
+    if (flagged && !showing) //showing boolean used to deal w/ issues for flagging already revealed stuff
       fill(240, 172, 82);
     else if ( clicked && mines.contains(this) ) 
       fill(255, 0, 0);
     else if (clicked && !flagged){
       fill( 200 );
-      //showing = true;
+      showing = true;
     }
     else 
     fill( 100 );
