@@ -2,20 +2,32 @@ import de.bezier.guido.*;
 //Declare and initialize constants NUM_ROWS and NUM_COLS = 20
 int NUM_ROWS = 25;
 int NUM_COLS = 25;
-
+private MyButton hardButton;
 private MSButton[][] buttons; //2d array of minesweeper buttons
 private ArrayList <MSButton> mines = new ArrayList<MSButton>(); //ArrayList of just the minesweeper buttons that are mined
-
+private int buttonsClicked = 0;
+private boolean isLost = false;
 void setup ()
 {
-  size(800, 500);
+
+
+  isLost = false;
+  buttonsClicked = 0;
+  showBombs = false;
+  for (int i = mines.size()-1; i >= 0; i--) {
+    mines.remove(i);
+  }
+
+  size(800, 700);
   textAlign(CENTER, CENTER);
 
   // make the manager
   Interactive.make( this );
-
+  hardButton = new MyButton(650, 250, 100, 45);
+  hardButton.setLabel("HARD");
   //your code to initialize buttons goes here
   buttons = new MSButton[NUM_ROWS][NUM_COLS];
+  //System.out.println(NUM_ROWS + ", " + NUM_COLS);
   for (int i = 0; i < buttons.length; i++) {
     for (int g = 0; g < buttons[i].length; g++) {
       buttons[i][g] = new MSButton(i, g);
@@ -23,9 +35,9 @@ void setup ()
   }
 
   //about 20% of tiles are mines
-  //System.out.println((int)((NUM_ROWS)*(NUM_COLS)*0.2));
+  ////System.out.println((int)((NUM_ROWS)*(NUM_COLS)*0.2));
   setMines((int)((NUM_ROWS)*(NUM_COLS)*0.2));
-  //System.out.println(i);
+  ////System.out.println(i);
 }
 
 public void setMines(int count)
@@ -34,7 +46,7 @@ public void setMines(int count)
 
   int rRow = (int)(Math.random()*NUM_ROWS);
   int rCol = (int)(Math.random()*NUM_COLS);
-  //System.out.println(rRow + ", " + rCol);
+  ////System.out.println(rRow + ", " + rCol);
   for (int i = 0; i < count; i++) {
     rRow = (int)(Math.random()*NUM_ROWS);
     rCol = (int)(Math.random()*NUM_COLS);
@@ -45,14 +57,28 @@ public void setMines(int count)
     }
   }
 }
+/*
+public void mousePressed() {
+  //System.out.println(mouseX + ", " + mouseY);
+}
+*/
 public void draw ()
 {
   background( 0 );
 
   if (isWon() == true)
     displayWinningMessage();
-  if(isLost) displayLosingMessage();
+  if (isLost) {
+    displayLosingMessage();
+    //delay(100);
+    toggleBombs(true);
+  }
+  if (hardButton.isOn()) {
+    //System.out.println("onononon");
+    setDifficulty(50);
+  }
 }
+
 
 public boolean isWon()
 {
@@ -68,16 +94,16 @@ public boolean isWon()
 
   return true;
 }
-private boolean isLost = false;
+
 public void displayLosingMessage()
 {
   //your code here
-  System.out.println("you died");
+  //System.out.println("you died");
   //noLoop();
 }
 public void displayWinningMessage()
 {
-  System.out.println("SKIBIDI SIGMA OHIO RIZZ");
+  //System.out.println("SKIBIDI SIGMA OHIO RIZZ");
   //your code here
 }
 public boolean isValid(int r, int c)
@@ -102,27 +128,39 @@ public int countMines(int row, int col)
       }
     }
   } else {
-    //System.out.println("invalid tile");
+    ////System.out.println("invalid tile");
   }
   return numMines;
 }
-//debug stuff
 private boolean showBombs = false;
-public void keyPressed(){
-  if(key == 'n' || key == 'N' && !showBombs){
-    showBombs = true;
-    for(int i = 0; i < buttons.length; i++){
-      for(int g = 0; g < buttons[i].length; g++){
-        if(mines.contains(buttons[i][g])){
-          buttons[i][g].setClicked(true);
-          buttons[i][g].draw();
-        }
+public void toggleBombs(boolean on) {
+  for (int i = 0; i < buttons.length; i++) {
+    for (int g = 0; g < buttons[i].length; g++) {
+      if (mines.contains(buttons[i][g])) {
+        buttons[i][g].setClicked(on);
+        buttons[i][g].draw();
       }
     }
   }
 }
+public void keyPressed() {
+  if (key == 'n' || key == 'N') {
+    if (!showBombs) {
+      showBombs = true;
+      toggleBombs(true);
+    }/*// doesn't work?? and breaks the ability to toggle bombs
+     if(showBombs){
+     showBombs = false;
+     toggleBombs(false);
+     }
+     */
+  }
+  if (key == 'r' || key == 'R') {
+    setup();
+    //System.out.println("reset");
+  }
+}
 
-private int buttonsClicked = 0; //used to make the first click create a blob
 public class MSButton
 {
   private int myRow, myCol;
@@ -132,8 +170,8 @@ public class MSButton
 
   public MSButton ( int row, int col )
   {
-    width = 400/NUM_COLS;
-    height = 400/NUM_ROWS;
+    width = 600/NUM_COLS;
+    height = 600/NUM_ROWS;
     myRow = row;
     myCol = col; 
     x = myCol*width;
@@ -145,11 +183,11 @@ public class MSButton
   }
 
   // called by manager
-  
-  
+
+
   public void mousePressed () 
   {
-    
+
     if (buttonsClicked <= 1 && mouseButton == LEFT) {
       buttonsClicked++;
       if (mines.contains(this)) { // makes it impossible to immediately lose
@@ -158,7 +196,7 @@ public class MSButton
 
       for (int i = myRow-1; i <= myRow+1; i++) { // starts the first blob no matter what
         for (int g = myCol-1; g <= myCol+1; g++) {
-          if (isValid(i, g) && !buttons[i][g].isClicked() && !buttons[i][g].isFlagged() && !mines.contains(buttons[i][g])) {
+          if (isValid(i, g) && !buttons[i][g].isClicked() && !buttons[i][g].isFlagged() && !mines.contains(buttons[i][g]) && mouseButton != RIGHT) {
             if (mouseButton == LEFT) {
               buttons[i][g].mousePressed();
             }
@@ -167,7 +205,7 @@ public class MSButton
       }
     }
     clicked = true;
-    
+
 
     if (mouseButton == RIGHT && !showing) {
       flagged = !flagged;
@@ -180,33 +218,30 @@ public class MSButton
     } else {
       for (int i = myRow-1; i <= myRow+1; i++) {
         for (int g = myCol-1; g <= myCol+1; g++) {
-          if (isValid(i, g) && !buttons[i][g].isClicked() && !buttons[i][g].isFlagged() && !mines.contains(buttons[i][g]) && !flagged) {
+          if (isValid(i, g) && !buttons[i][g].isClicked() && !buttons[i][g].isFlagged() && !mines.contains(buttons[i][g]) && !flagged && mouseButton != RIGHT) {
             buttons[i][g].mousePressed();
           }
         }
       }
     }
     //your code here
-    
-    
   }
   public void draw () 
   {
-    
-    if (flagged && !showing) //showing boolean used to deal w/ issues for flagging already revealed stuff
+
+    if (flagged && !showing)
       fill(240, 172, 82);
     else if ( clicked && mines.contains(this) ) 
       fill(255, 0, 0);
-    else if (clicked && !flagged){
+    else if (clicked && !flagged) {
       fill( 200 );
       showing = true;
-    }
-    else 
+    } else 
     fill( 100 );
 
     rect(x, y, width, height);
     fill(0);
-    text(myLabel, x+width/2, y+height/2);
+    text(myLabel, x+width/2+0.5, y+height/2-1);
   }
   public void setLabel(String newLabel)
   {
@@ -223,7 +258,7 @@ public class MSButton
   public boolean isClicked() {
     return clicked;
   }
-  public void setClicked(boolean c){
+  public void setClicked(boolean c) {
     clicked = c;
   }
 
@@ -232,5 +267,52 @@ public class MSButton
   }
   public int getCol() {
     return myCol;
+  }
+} // end minesweeper button class
+
+public  void setDifficulty(int size) {
+  NUM_ROWS = size;
+  NUM_COLS = size;
+  setup();
+  //System.out.println("Reset and difficulty changed");
+}
+public class MyButton
+{
+  private float x, y, width, height;
+  private boolean on;
+  private String myLabel;
+  public MyButton ( float xx, float yy, float w, float h )
+  {
+    x = xx; 
+    y = yy; 
+    width = w; 
+    height = h;
+    myLabel = "";
+    Interactive.add( this ); // register it with the manager
+  }
+  public void mousePressed () { 
+    on = !on;
+  }
+  public void mouseReleased() {
+    on = !on;
+  }
+
+
+
+  public void draw ()
+  {
+    if ( on ) {
+      fill(200, 0, 0 );
+      //setup();
+    } else fill(255, 0, 0);  
+    rect(x, y, width, height);
+    fill(0);
+    text(myLabel, x+width/2, y+height/2);
+  }
+  public boolean isOn() {
+    return on;
+  }
+  public void setLabel(String newLabel) {
+    myLabel = newLabel;
   }
 }
