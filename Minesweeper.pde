@@ -1,7 +1,7 @@
 import de.bezier.guido.*;
 //Declare and initialize constants NUM_ROWS and NUM_COLS = 20
-int NUM_ROWS = 25;
-int NUM_COLS = 25;
+int NUM_ROWS = 5;
+int NUM_COLS = 5;
 private MyButton hardButton;
 private MSButton[][] buttons; //2d array of minesweeper buttons
 private ArrayList <MSButton> mines = new ArrayList<MSButton>(); //ArrayList of just the minesweeper buttons that are mined
@@ -24,7 +24,7 @@ void setup ()
   // make the manager
   Interactive.make( this );
   hardButton = new MyButton(650, 250, 100, 45);
-  hardButton.setLabel("HARD");
+  hardButton.setLabel("RESET");
   //your code to initialize buttons goes here
   buttons = new MSButton[NUM_ROWS][NUM_COLS];
   //System.out.println(NUM_ROWS + ", " + NUM_COLS);
@@ -59,15 +59,16 @@ public void setMines(int count)
 }
 /*
 public void mousePressed() {
-  //System.out.println(mouseX + ", " + mouseY);
-}
-*/
+ //System.out.println(mouseX + ", " + mouseY);
+ }
+ */
 public void draw ()
 {
   background( 0 );
 
   if (isWon() == true)
     displayWinningMessage();
+
   if (isLost) {
     displayLosingMessage();
     //delay(100);
@@ -75,7 +76,7 @@ public void draw ()
   }
   if (hardButton.isOn()) {
     //System.out.println("onononon");
-    setDifficulty(50);
+    setup();
   }
 }
 
@@ -92,18 +93,23 @@ public boolean isWon()
   }
 
 
-  return true;
+  return (true&&!isLost);
 }
 
 public void displayLosingMessage()
 {
   //your code here
-  //System.out.println("you died");
+  System.out.println("you died");
+
   //noLoop();
 }
 public void displayWinningMessage()
 {
   //System.out.println("SKIBIDI SIGMA OHIO RIZZ");
+  for (int i = 0; i < buttons.length; i++) {
+    for (int g = 0; g < buttons[i].length; g++) {
+    }
+  }
   //your code here
 }
 public boolean isValid(int r, int c)
@@ -238,7 +244,9 @@ public class MSButton
       showing = true;
     } else 
     fill( 100 );
-
+    if (isWon() == true) {
+      fill(0, 255, 0);
+    }
     rect(x, y, width, height);
     fill(0);
     text(myLabel, x+width/2+0.5, y+height/2-1);
@@ -304,7 +312,7 @@ public class MyButton
     if ( on ) {
       fill(200, 0, 0 );
       //setup();
-    } else fill(255, 0, 0);  
+    } else fill(100, 150, 205);  
     rect(x, y, width, height);
     fill(0);
     text(myLabel, x+width/2, y+height/2);
