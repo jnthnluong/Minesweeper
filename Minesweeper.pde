@@ -262,25 +262,30 @@ public class MSButton
   {
 
     if (flagged && !showing) {
-      fill(240, 172, 82);
+      fill(255,255,0);
+      
     } else if ( clicked && mines.contains(this) ) 
       fill(255, 0, 0);
     else if (clicked && !flagged) {
-      fill( 200 );
+      fill(#EAC547);
       showing = true;
-    } else 
-    fill( 100 );
+    } else {
+      fill(110,255,100);
+      if(myCol%2 == 0 || myRow%2 == 0) fill(#22C95B);
+    }
+    
     if (isWon() == true) {
       fill(0, 255, 0);
     }
+    
     rect(x, y, width, height);
     if(myValue == 1) fill(0,0,255);
-    if(myValue == 2) fill(0,255,0);
+    if(myValue == 2) fill(#37A042);
     if(myValue == 3) fill(255,0,0);
     if(myValue == 4) fill(127,0,255);
     if(myValue == 5) fill(255,140,0);
     if(myValue == 6) fill(0,255,255);
-    if(myValue == 7) fill(0,0,128);
+    if(myValue == 7) fill(0,0,128);// i guess we will never see these two
     if(myValue == 8) fill(211,211,211);
     
     textSize(width/1.5);
