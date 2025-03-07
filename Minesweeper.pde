@@ -270,8 +270,8 @@ public class MSButton
       fill(#EAC547);
       showing = true;
     } else {
-      fill(110,255,100);
-      if(myCol%2 == 0 || myRow%2 == 0) fill(#22C95B);
+      fill(#AAD751);
+      if(myCol%2 == 0 || myRow%2 == 0) fill(#A2D149);
     }
     
     if (isWon() == true) {
