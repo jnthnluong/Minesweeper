@@ -69,7 +69,7 @@ public void draw ()
   // System.out.println(buttonsFlagged);
   // System.out.println(mines.size() + " mines");
   // System.out.println(buttonsClicked);
-  background( 0 );
+  background( #44B736 );
 
   if (isWon() == true)
     displayWinningMessage();
@@ -172,16 +172,7 @@ public void keyPressed() {
     if (!showBombs) {
       showBombs = true;
       toggleBombs(true);
-    }/*// doesn't work?? and breaks the ability to toggle bombs
-     if(showBombs){
-     showBombs = false;
-     toggleBombs(false);
-     }
-     */
-  }
-  if (key == 'r' || key == 'R') {
-    setup();
-    //System.out.println("reset");
+    }
   }
 }
 
@@ -189,11 +180,13 @@ public class MSButton
 {
   private int myRow, myCol, myValue;
   private float x, y, width, height;
-  private boolean clicked, flagged, showing;
+  private boolean clicked, flagged, showing, isFlower;
   private String myLabel;
+  private color myColor;
 
   public MSButton ( int row, int col )
   {
+    myColor = color((int)(Math.random()*255+90), (int)(Math.random()*255+60), (int)(Math.random()*200));
     width = 600/NUM_COLS;
     height = 600/NUM_ROWS;
     myValue = 0;
@@ -208,6 +201,7 @@ public class MSButton
     //System.out.println(flagged);
     // System.out.println(clicked);
     Interactive.add( this ); // register it with the manager
+    if ((int)(Math.random()*100) < 5) isFlower = true;
   }
 
   // called by manager
@@ -215,6 +209,7 @@ public class MSButton
 
   public void mousePressed () 
   {
+    isFlower = false;
     //System.out.println(buttonsClicked);
     if (buttonsClicked <= 1 && mouseButton == LEFT) {
       buttonsClicked++;
@@ -232,11 +227,11 @@ public class MSButton
         }
       }
     }
-    clicked = true;
+    if (!isLost)clicked = true;
 
 
 
-    if (mouseButton == RIGHT && !showing) {
+    if (mouseButton == RIGHT && !showing && !isLost) {
 
       flagged = !flagged;
 
@@ -244,13 +239,13 @@ public class MSButton
     } else if (mines.contains(this) && !flagged) {
       displayLosingMessage();
       isLost = true;
-    } else if (countMines(myRow, myCol)>0 && !flagged) {
+    } else if (countMines(myRow, myCol)>0 && !flagged && !isLost) {
       myValue = countMines(myRow, myCol);
       setLabel(countMines(myRow, myCol));
     } else {
       for (int i = myRow-1; i <= myRow+1; i++) {
         for (int g = myCol-1; g <= myCol+1; g++) {
-          if (isValid(i, g) && !buttons[i][g].isClicked() && !buttons[i][g].isFlagged() && !mines.contains(buttons[i][g]) && !flagged && mouseButton != RIGHT) {
+          if (isValid(i, g) && !buttons[i][g].isClicked() && !buttons[i][g].isFlagged() && !mines.contains(buttons[i][g]) && !flagged && mouseButton != RIGHT && !isLost) {
             buttons[i][g].mousePressed();
           }
         }
@@ -260,34 +255,51 @@ public class MSButton
   }
   public void draw () 
   {
+    if (isLost) {
+      myColor = 0;
+    }
+    if (isWon()) {
+      isFlower = true;
+    }
 
     if (flagged && !showing) {
-      fill(255,255,0);
-      
+      fill(255, 255, 0);
     } else if ( clicked && mines.contains(this) ) 
       fill(255, 0, 0);
     else if (clicked && !flagged) {
       fill(#EAC547);
       showing = true;
     } else {
-      fill(#AAD751);
-      if(myCol%2 == 0 || myRow%2 == 0) fill(#A2D149);
+      fill(110, 255, 100);
+      if (myCol%2 == 0 || myRow%2 == 0) fill(#22C95B);
     }
-    
+
     if (isWon() == true) {
       fill(0, 255, 0);
     }
-    
+    if (isLost) {
+      fill(#79654F);
+      if (myCol%2 == 0 || myRow%2 == 0) fill(#676057);
+    }
+    if ( clicked && mines.contains(this) ) 
+      fill(255, 0, 0);
     rect(x, y, width, height);
-    if(myValue == 1) fill(0,0,255);
-    if(myValue == 2) fill(#37A042);
-    if(myValue == 3) fill(255,0,0);
-    if(myValue == 4) fill(127,0,255);
-    if(myValue == 5) fill(255,140,0);
-    if(myValue == 6) fill(0,255,255);
-    if(myValue == 7) fill(0,0,128);// i guess we will never see these two
-    if(myValue == 8) fill(211,211,211);
-    
+    if (myValue == 1) fill(0, 0, 255);
+    if (myValue == 2) fill(#37A042);
+    if (myValue == 3) fill(255, 0, 0);
+    if (myValue == 4) fill(127, 0, 255);
+    if (myValue == 5) fill(255, 140, 0);
+    if (myValue == 6) fill(0, 255, 255);
+    if (myValue == 7) fill(0, 0, 128);// i guess we will never see these two
+    if (myValue == 8) fill(211, 211, 211);
+    if (isFlower) {
+      fill(myColor);
+      ellipse(x+width/1.5-4, y+height/2, 10, 10+10);
+      ellipse(x+width/1.5-4, y+height/2, 10+10, 10);
+      fill(#FEFFBC);
+      if (isLost) fill(#463E3E);
+      ellipse(x+width/1.5-4, y+height/2, 10, 10);
+    }
     textSize(width/1.5);
     text(myLabel, x+width/2+0.5, y+height/2-1);
   }
