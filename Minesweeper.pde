@@ -16,6 +16,7 @@ void setup ()
   showBombs = false;
   for (int i = mines.size()-1; i >= 0; i--) {
     mines.remove(i);
+    
   }
 
   size(800, 700);
@@ -161,7 +162,9 @@ public void toggleBombs(boolean on) {
   for (int i = 0; i < buttons.length; i++) {
     for (int g = 0; g < buttons[i].length; g++) {
       if (mines.contains(buttons[i][g])) {
+        buttons[i][g].setFlagged(false);
         buttons[i][g].setClicked(on);
+        buttons[i][g].setShowing(false);
         buttons[i][g].draw();
       }
     }
