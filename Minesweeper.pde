@@ -281,7 +281,7 @@ public class MSButton
       fill(#79654F);
       if (myCol%2 == 0 || myRow%2 == 0) fill(#676057);
     }
-    if ( clicked && mines.contains(this) ) 
+    if ( clicked && mines.contains(this) && !flagged ) 
       fill(255, 0, 0);
     rect(x, y, width, height);
     if (myValue == 1) fill(0, 0, 255);
